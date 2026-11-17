@@ -23,5 +23,36 @@
     <div class="panel__body"><div class="bar"><i style="width:55%"></i></div><div class="legend"><span>采纳 36</span><span>隔离 1</span></div></div>
   </section>
 </div>
+<div class="grid grid--quad">
+  <section class="panel">
+    <div class="panel__head"><h2>同票补报导入</h2><span class="panel__meta">各来源整票留作候选</span></div>
+    <div class="panel__body">
+      <textarea id="reports-payload" class="payload" rows="12" spellcheck="false">{
+  "reports": [
+    {"source": "erp", "doc_type": "IV", "doc_no": "IV-8801", "lines": [
+      {"sku": "000142", "qty": "10", "amount": "1,000.00", "tax_rate": "13%"}
+    ]},
+    {"source": "supplier-portal", "doc_type": "IV", "doc_no": "IV-8801", "lines": [
+      {"sku": "000142", "qty": "10", "amount": "880.00", "tax_rate": "13%"}
+    ]},
+    {"source": "erp", "doc_type": "IV", "doc_no": "IV-8802", "lines": [
+      {"sku": "000143", "qty": "5", "amount": "500.00", "tax_rate": "9%"}
+    ]}
+  ]
+}</textarea>
+      <p class="hint">同票不同内容自动成为争议候选；旧值重放不翻案，新内容重新待审。</p>
+      <button class="btn btn--primary" id="import-reports">导入补报</button>
+      <pre id="import-result">等待导入</pre>
+    </div>
+  </section>
+  <section class="panel">
+    <div class="panel__head"><h2>争议待裁决</h2><span class="panel__meta" id="dispute-count">0 票</span></div>
+    <div class="panel__body panel__body--scroll" id="disputes"><p class="empty">载入中</p></div>
+  </section>
+  <section class="panel panel--status">
+    <div class="panel__head"><h2>有效凭据</h2><span class="panel__meta" id="voucher-count">0 票</span></div>
+    <div class="panel__body panel__body--scroll" id="vouchers"><p class="empty">载入中</p></div>
+  </section>
+</div>
+<script src="/static/documents.js"></script>
 {% endblock %}
-

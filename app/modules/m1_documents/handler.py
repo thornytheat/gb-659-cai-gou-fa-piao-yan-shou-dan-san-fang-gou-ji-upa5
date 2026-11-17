@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Body, Request
 from fastapi.responses import HTMLResponse
 from app.web import page
+from . import service
 from .service import demo
 
 router = APIRouter()
@@ -14,3 +15,18 @@ def view(request: Request):
 def execute():
     return demo()
 
+@router.post("/api/documents/reports")
+def import_reports(payload: dict = Body(...)):
+    return service.import_reports(payload)
+
+@router.post("/api/documents/adjudicate")
+def adjudicate(payload: dict = Body(...)):
+    return service.adjudicate_ticket(payload)
+
+@router.get("/api/documents/vouchers")
+def vouchers():
+    return service.vouchers()
+
+@router.get("/api/documents/disputes")
+def disputes():
+    return service.disputes()

@@ -10,7 +10,7 @@ docker compose up --build
 
 ## 模块
 
-- M1 单据采信：页面 /documents，接口 /api/documents/import
+- M1 单据采信：页面 /documents，接口 /api/documents/import；同票多源补报 /api/documents/reports，裁决 /api/documents/adjudicate，有效凭据 /api/documents/vouchers，争议 /api/documents/disputes
 - M2 主数据映射：页面 /master，接口 /api/master/resolve
 - M3 数量勾稽：页面 /quantity，接口 /api/quantity/match
 - M4 税额核验：页面 /tax，接口 /api/tax/check

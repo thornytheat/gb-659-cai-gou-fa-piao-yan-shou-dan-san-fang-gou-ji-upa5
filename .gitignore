@@ -21,6 +21,7 @@ out/
 .vite/
 .parcel-cache/
 coverage/
+data/
 __pycache__/
 *.pyc
 .venv/

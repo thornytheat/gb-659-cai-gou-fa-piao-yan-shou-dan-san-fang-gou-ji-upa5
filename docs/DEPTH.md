@@ -8,7 +8,7 @@
 
 | 模块 | 使用者动作 | 入口 | 核心文件 | 测试 |
 |---|---|---|---|---|
-| M1 单据采信 | 导入三类单据并隔离冲突 | POST /api/documents/import | `app/modules/m1_documents/parser.py` `app/modules/m1_documents/money.py` | `tests/test_m1_documents.py` |
+| M1 单据采信 | 导入三类单据并隔离冲突；同票多源补报裁决 | POST /api/documents/import · /api/documents/reports · /api/documents/adjudicate | `app/modules/m1_documents/parser.py` `app/modules/m1_documents/money.py` `app/modules/m1_documents/tickets.py` | `tests/test_m1_documents.py` `tests/test_m1_tickets.py` |
 | M2 主数据映射 | 归一货号与旧字段 | POST /api/master/resolve | `app/modules/m2_master/aliases.py` `app/modules/m2_master/evolve.py` | `tests/test_m2_master.py` |
 | M3 数量勾稽 | 统一包装单位并核对未到量 | POST /api/quantity/match | `app/modules/m3_quantity/units.py` `app/modules/m3_quantity/match.py` | `tests/test_m3_quantity.py` |
 | M4 税额核验 | 重算净额、税额与含税额 | POST /api/tax/check | `app/modules/m4_tax/calculate.py` `app/modules/m4_tax/verify.py` | `tests/test_m4_tax.py` |
@@ -29,6 +29,10 @@
 | TRAP-19 | 组合候选顺序变化 | 匹配结果随输入顺序变化 | 按差额、数量与编号稳定择一 | `app/modules/m5_matching/solver.py` | `tests/test_m5_matching.py::test_choice_is_order_independent` |
 | TRAP-23 | 相邻税率边界 | 不同税率金额互相抵消 | 货号与税率共同分组 | `app/modules/m4_tax/verify.py` | `tests/test_m4_tax.py::test_different_tax_rates_never_offset` |
 | TRAP-26 | 同批重复执行 | 重复新增对账结果 | 输入摘要作为运行唯一键 | `app/store.py` | `tests/test_m6_batches.py::test_idempotent_record` |
+| TRAP-27 | 同票旧值重放 | 按到达覆盖反复改账 | 各来源整票留作候选，重放只记见闻不翻案 | `app/modules/m1_documents/tickets.py` | `tests/test_m1_tickets.py::test_old_value_replay_does_not_overturn` |
+| TRAP-28 | 拼接各来源的行 | 拼出从未整票上报的内容入账 | 裁决只接受现存整票候选摘要 | `app/modules/m1_documents/tickets.py` | `tests/test_m1_tickets.py::test_spliced_lines_are_not_adjudicatable` |
+| TRAP-29 | 并发裁决同一争议 | 双份裁决重复落账 | 候选版本栅栏加幂等键，过期候选拒绝 | `app/modules/m1_documents/tickets.py` | `tests/test_m1_tickets.py::test_concurrent_adjudication_second_rejected` |
+| TRAP-30 | 裁决落账中断 | 重试重复采信或丢账 | 恢复同次裁决，落账按裁决标识唯一 | `app/modules/m1_documents/tickets.py` | `tests/test_m1_tickets.py::test_interrupted_posting_resumes_same_adjudication` |
 
 ## 对账规则
 
@@ -36,7 +40,16 @@
 - 净验收含税额 = 已开票含税额 + 未开票金额 + 已解释差异。
 - 不同税率的行不可相互抵消。
 
+## 同票多源裁决规则
+
+- 同票（单据类型 + 单号）各来源整票留作候选，按规范化内容摘要归并。
+- 首报单候选自动生效；出现新内容即争议未决，该票暂停勾稽。
+- 裁决凭原件理由（原因码）选择一整票候选，绑定其内容摘要，禁止拼接各来源的行。
+- 旧值重放只更新候选见闻，不翻案；新内容使争议重新待审。
+- 裁决声明候选版本，并发或过期候选拒绝；裁决先记录后落账，中断恢复同次裁决，重试不重复采信。
+
 ## 已知不覆盖
 
 - 不处理外币汇兑，样例与输出均为人民币。
+- 不做付款处理，不改动商品映射。
 

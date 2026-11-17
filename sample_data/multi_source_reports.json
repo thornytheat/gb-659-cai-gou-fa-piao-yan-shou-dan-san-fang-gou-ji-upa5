@@ -1,0 +1,13 @@
+{
+  "reports": [
+    {"source": "erp", "doc_type": "IV", "doc_no": "IV-8801", "lines": [
+      {"sku": "000142", "qty": "10", "amount": "1,000.00", "tax_rate": "13%"}
+    ]},
+    {"source": "supplier-portal", "doc_type": "IV", "doc_no": "IV-8801", "lines": [
+      {"sku": "000142", "qty": "10", "amount": "880.00", "tax_rate": "13%"}
+    ]},
+    {"source": "erp", "doc_type": "IV", "doc_no": "IV-8802", "lines": [
+      {"sku": "000143", "qty": "5", "amount": "500.00", "tax_rate": "9%"}
+    ]}
+  ]
+}
